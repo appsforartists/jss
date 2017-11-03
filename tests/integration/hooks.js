@@ -291,9 +291,10 @@ describe('Integration: hooks', () => {
     let receivedSheet
     let executed = 0
     let sheet
-    const newStyle = {color: 'green'}
+    let newStyle
 
     beforeEach(() => {
+      newStyle = {color: 'green'}
       jss.use({
         onProcessStyle: (style, rule, passedSheet) => {
           receivedStyle = style
@@ -366,6 +367,28 @@ describe('Integration: hooks', () => {
       })
       expect(sheet.getRule('a').style).to.be(newStyle)
       expect(passedStyle).to.be(newStyle)
+    })
+
+    it('should passthrough truthy $isDynamic', () => {
+      const ruleStyle = {}
+
+      Object.defineProperty(ruleStyle, '$isDynamic', {
+        value: true,
+        writable: false
+      })
+
+      sheet = jss.createStyleSheet({
+        a: ruleStyle
+      })
+
+      expect(sheet.getRule('a').style.$isDynamic).to.be(true)
+    })
+
+    it('should only set $isDynamic if true', () => {
+      sheet = jss.createStyleSheet({
+        div: {}
+      })
+      expect(sheet.getRule('div').style.$isDynamic).to.be(undefined)
     })
   })
 })

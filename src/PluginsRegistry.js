@@ -47,6 +47,14 @@ export default class PluginsRegistry {
 
     for (let i = 0; i < this.hooks.onProcessStyle.length; i++) {
       nextStyle = this.hooks.onProcessStyle[i](nextStyle, rule, sheet)
+
+      if (rule.style && rule.style.$isDynamic && nextStyle.$isDynamic === undefined) {
+        Object.defineProperty(nextStyle, '$isDynamic', {
+          value: rule.style.$isDynamic,
+          writable: false
+        })
+      }
+
       // $FlowFixMe
       rule.style = nextStyle
     }
